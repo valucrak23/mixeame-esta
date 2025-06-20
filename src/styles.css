@@ -2259,43 +2259,31 @@ body.dark-mode .girly-text {
 
 /* Modo fiesta para texto girly */
 body.fiesta-mode .girly-text {
-  background: linear-gradient(45deg, #ff69b4, #ff1493, #ff69b4, #ff69b4);
-  background-size: 300% 300%;
-  animation: girlyFiesta 2s ease infinite;
-  text-shadow: 0 0 10px #ff69b4;
+  background: none;
+  -webkit-text-fill-color: unset;
+  color: white;
+  text-shadow: 1px 1px 0 #dd0077;
+  animation: none;
+  transform: none !important;
 }
 
-@keyframes girlyFiesta {
-  0%, 100% { 
-    background-position: 0% 50%; 
-    transform: scale(1);
-  }
-  50% { 
-    background-position: 100% 50%; 
-    transform: scale(1.05);
-  }
+@keyframes girlyGradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 body.fiesta-mode .girly-text::before,
 body.fiesta-mode .girly-text::after {
-  animation: sparkleFiesta 1.5s ease-in-out infinite;
+  animation: sparkle 2s ease-in-out infinite;
 }
 
-@keyframes sparkleFiesta {
+@keyframes sparkle {
   0%, 100% { 
     transform: translateY(-50%) scale(1) rotate(0deg); 
-    opacity: 0.8;
-  }
-  25% { 
-    transform: translateY(-50%) scale(1.3) rotate(90deg); 
-    opacity: 1;
+    opacity: 0.7;
   }
   50% { 
-    transform: translateY(-50%) scale(1.1) rotate(180deg); 
-    opacity: 0.9;
-  }
-  75% { 
-    transform: translateY(-50%) scale(1.4) rotate(270deg); 
+    transform: translateY(-50%) scale(1.2) rotate(180deg); 
     opacity: 1;
   }
 } 
