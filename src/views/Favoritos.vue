@@ -1,15 +1,21 @@
+<!-- ESTO ES EXTRA: Vista completa de favoritos -->
+<!-- esta vista la hice yo -valen -->
+<!-- el pdf fui yo -alfredo -->
 <template>
   <div class="container py-4" ref="contenedorFavs">
     <h1 class="mb-4 pastel-title text-center">Tus Cócteles Favoritos</h1>
     <div class="d-flex flex-wrap gap-3 align-items-center justify-content-center mb-4">
+      <!-- ESTO ES EXTRA: Filtro por categoría en favoritos -->
       <select v-model="filtroCategoria" class="form-select pastel-input select-categoria" style="max-width:220px" @change="filtrarPorCategoria">
         <option value="">Todas las categorías</option>
         <option v-for="cat in categorias" :key="cat" :value="cat">{{ cat }}</option>
       </select>
+      <!-- ESTO ES EXTRA: Ordenamiento en favoritos -->
       <select v-model="orden" class="form-select pastel-input select-categoria" style="max-width:180px">
         <option value="az">Nombre (A-Z)</option>
         <option value="za">Nombre (Z-A)</option>
       </select>
+      <!-- ESTO ES EXTRA: Exportar a PDF -->
       <div class="d-flex gap-2" v-if="cocktailsFiltradosYOrdenados.length">
         <button class="btn btn-outline-info ripple-click" @click="exportarPDF" title="Exportar favoritos en formato PDF">
           📋 PDF
@@ -24,6 +30,7 @@
       </transition>
       <transition-group name="fade-slide" tag="div" v-if="!cargando && cocktailsFiltradosYOrdenados.length" class="row g-4">
         <div v-for="drink in cocktailsFiltradosYOrdenados" :key="drink.idDrink" class="col-12 col-sm-6 col-md-4 col-lg-3">
+          <!-- ESTO ES EXTRA: Cards con efecto flip -->
           <div
             class="card h-100 shadow pastel-card card-coctel flip-card"
             :class="{ flipped: flippedCard === drink.idDrink }"
@@ -63,6 +70,7 @@
         </div>
       </transition>
     </div>
+    <!-- ESTO ES EXTRA: Botón de scroll to top -->
     <button v-show="showScrollTop" class="btn-scroll-top" @click="scrollToTop" aria-label="Volver arriba">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 19V5M12 5L5 12M12 5l7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -73,6 +81,7 @@
 
 <script>
 import Loader from '../components/Loader.vue';
+// ESTO ES EXTRA: Librerías para exportar PDF
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -83,19 +92,23 @@ export default {
       cocktails: [],
       cargando: true,
       error: null,
+      // ESTO ES EXTRA: Filtros y ordenamiento
       filtroCategoria: '',
       orden: 'az',
+      // ESTO ES EXTRA: Efectos visuales
       flippedCard: null,
       animarLike: null,
       showScrollTop: false,
     };
   },
   computed: {
+    // ESTO ES EXTRA: Categorías únicas de favoritos
     categorias() {
       // Extrae categorías únicas de los favoritos
       const cats = this.cocktails.map(c => c.strCategory).filter(Boolean);
       return [...new Set(cats)].sort();
     },
+    // ESTO ES EXTRA: Cócteles filtrados y ordenados
     cocktailsFiltradosYOrdenados() {
       let arr = this.cocktails;
       if (this.filtroCategoria) {
@@ -142,6 +155,7 @@ export default {
   },
   components: { Loader },
   methods: {
+    // ESTO ES EXTRA: Efecto flip en cards
     flipCard(id) {
       if (this.flippedCard === id) {
         this.flippedCard = null;
@@ -157,6 +171,7 @@ export default {
       }
       return ings;
     },
+    // ESTO ES EXTRA: Quitar de favoritos
     quitarFavorito(drink) {
       if (!window.confirm('¿Seguro que quieres eliminar este cóctel de tus favoritos?')) return;
       let favs = JSON.parse(localStorage.getItem('favoritos')) || [];
@@ -165,6 +180,7 @@ export default {
       this.animarLike = drink.idDrink;
       setTimeout(() => { this.animarLike = null; }, 500);
       this.cocktails = this.cocktails.filter(c => c.idDrink !== drink.idDrink);
+      // ESTO ES EXTRA: Notificación toast
       window.dispatchEvent(new CustomEvent('mostrar-toast', { 
         detail: { 
           mensaje: '¡Eliminado de favoritos!', 
@@ -173,6 +189,7 @@ export default {
         } 
       }));
     },
+    // ESTO ES EXTRA: Scroll a las cards
     scrollToCards() {
       this.$nextTick(() => {
         const el = this.$refs.contenedorFavs;
@@ -183,20 +200,25 @@ export default {
         }
       });
     },
+    // ESTO ES EXTRA: Scroll to top
     scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
+    // ESTO ES EXTRA: Manejar botón de scroll
     handleScrollBtn() {
       this.showScrollTop = window.scrollY > 200;
     },
+    // ESTO ES EXTRA: Cambiar página
     cambiarPagina(nueva) {
       if (nueva < 1 || nueva > this.totalPaginas) return;
       this.paginaActual = nueva;
       this.scrollToCards();
     },
+    // ESTO ES EXTRA: Filtrar por categoría
     filtrarPorCategoria() {
       this.scrollToCards();
     },
+    // ESTO ES EXTRA: Exportar a PDF
     exportarPDF() {
       if (!this.cocktailsFiltradosYOrdenados.length) {
         window.dispatchEvent(new CustomEvent('mostrar-toast', { 
@@ -288,6 +310,7 @@ export default {
       // Guardar PDF
       pdf.save(`favoritos_cocktails_${new Date().toISOString().split('T')[0]}.pdf`);
       
+      // ESTO ES EXTRA: Notificación toast
       window.dispatchEvent(new CustomEvent('mostrar-toast', { 
         detail: { 
           mensaje: '¡Favoritos exportados en PDF!', 

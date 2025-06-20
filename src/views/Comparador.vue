@@ -1,3 +1,6 @@
+<!-- ESTO ES EXTRA: Vista completa de comparador de cócteles -->
+<!-- esta vista fue idea mia pero la implementamos entre todos -valen -->
+<!-- el modal me costo un monton -agos -->
 <template>
   <div class="container py-4">
     <h1 class="mb-4 pastel-title text-center">Comparador de Cócteles</h1>
@@ -186,7 +189,8 @@ export default {
     };
   },
   async created() {
-    // Redirigir en dispositivos móviles
+    // ESTO ES EXTRA: Redirigir en dispositivos móviles
+    // esto lo agregamos porque en mobile no se ve bien -alfredo
     if (window.innerWidth < 992) {
       this.$router.push('/');
       window.dispatchEvent(new CustomEvent('mostrar-toast', { 
@@ -203,6 +207,7 @@ export default {
     await this.cargarCocktails();
   },
   methods: {
+    // ESTO ES EXTRA: Cargar últimos vistos
     async cargarUltimosVistos() {
       const vistosIds = JSON.parse(localStorage.getItem('ultimos_vistos')) || [];
       const vistos = [];

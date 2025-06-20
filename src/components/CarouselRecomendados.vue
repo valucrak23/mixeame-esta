@@ -1,3 +1,6 @@
+<!-- ESTO ES EXTRA: Componente de carrusel de cócteles recomendados -->
+<!-- el carrusel me costo un monton hacerlo funcionar -valen -->
+<!-- pero quedo re bueno -agos -->
 <template>
   <div class="carousel-wrapper">
     <h2 class="text-center mb-4 pastel-section">🍹 Cócteles Recomendados</h2>
@@ -22,6 +25,7 @@
                   </li>
                 </ul>
                 <div class="carousel-actions">
+                  <!-- ESTO ES EXTRA: Botón de favoritos en el carrusel -->
                   <button class="btn btn-outline-danger ripple-click btn-like" @click.stop="toggleLike(cocktail)" :aria-label="isFavorito(cocktail.idDrink) ? 'Quitar de favoritos' : 'Agregar a favoritos'">
                     <span class="corazon-pop" :class="{ pop: animarLike === cocktail.idDrink }">
                       {{ isFavorito(cocktail.idDrink) ? '❤️' : '🤍' }}
@@ -59,6 +63,7 @@ export default {
     Loader
   },
   setup() {
+    // ESTO ES EXTRA: Sistema de toast notifications
     const toast = useToast();
     return { toast };
   },
@@ -66,6 +71,7 @@ export default {
     return {
       cocktails: [],
       loading: true,
+      // ESTO ES EXTRA: Animación de like
       animarLike: null,
       carousel: null
     };
@@ -90,6 +96,7 @@ export default {
     }
   },
   methods: {
+    // ESTO ES EXTRA: Cargar cócteles recomendados
     async cargarRecomendados() {
       try {
         this.loading = true;
@@ -156,6 +163,7 @@ export default {
       }
       return ingredients.slice(0, 4);
     },
+    // ESTO ES EXTRA: Verificar si es favorito
     isFavorito(id) {
       try {
         const favoritosStr = localStorage.getItem('favoritos');
@@ -167,6 +175,7 @@ export default {
         return false;
       }
     },
+    // ESTO ES EXTRA: Toggle de favoritos
     toggleLike(drink) {
       try {
         const favoritosStr = localStorage.getItem('favoritos');

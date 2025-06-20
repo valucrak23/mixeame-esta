@@ -1,3 +1,7 @@
+<!-- ESTO ES EXTRA: Componente completo de confeti para efectos visuales -->
+<!-- esto no funca -valen -->
+<!-- ahora si -agos -->
+<!-- buenisimo -alfredo -->
 <template>
   <div class="confeti-container">
     <div 
@@ -21,18 +25,20 @@ export default {
   name: 'Confeti',
   data() {
     return {
+      // ESTO ES EXTRA: Sistema de partículas de confeti
       particulas: [],
       contadorId: 0
     }
   },
   mounted() {
-    // Escuchar eventos de confeti desde cualquier parte de la app
+    // ESTO ES EXTRA: Escuchar eventos de confeti desde cualquier parte de la app
     window.addEventListener('explosion-confeti', this.crearExplosion);
   },
   beforeUnmount() {
     window.removeEventListener('explosion-confeti', this.crearExplosion);
   },
   methods: {
+    // ESTO ES EXTRA: Crear explosión de confeti
     crearExplosion(evento) {
       const { x, y, tipo = 'normal', intensidad = 1 } = evento.detail;
       

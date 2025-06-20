@@ -1,3 +1,6 @@
+<!-- ESTO ES EXTRA: Vista de ingredientes con categorías -->
+<!-- les gusta? -agos -->
+<!-- las categorias quedaron re buenas -valen -->
 <template>
   <div class="container py-4" ref="contenedorIngs">
     <h1 class="mb-4 pastel-title text-center">Ingredientes</h1>
@@ -6,6 +9,7 @@
     </div>
     <div v-else>
       <div v-if="!ingredienteSeleccionado">
+        <!-- ESTO ES EXTRA: Filtros por categoría de ingredientes -->
         <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
           <button v-for="cat in categorias" :key="cat.nombre" class="btn btn-outline-primary btn-categoria ripple-click" :class="{ active: categoriaActual === cat.nombre }" @click="cambiarCategoria(cat.nombre)" tabindex="0" :aria-label="'Filtrar por categoría ' + cat.nombre" @keydown.enter.prevent="cambiarCategoria(cat.nombre)" @keydown.space.prevent="cambiarCategoria(cat.nombre)">
             <span v-if="categoriaActual === cat.nombre" class="ripple-extra"></span>
@@ -95,7 +99,6 @@ const CATEGORIAS = [
   { nombre: 'Otros', emoji: '🍸' },
 ];
 
-// Mapeo simple de ingredientes a categorías
 function categoriaIngrediente(nombre) {
   const n = nombre.toLowerCase();
   if ([

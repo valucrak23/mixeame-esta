@@ -87,11 +87,9 @@ export default {
       const res = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${this.id}`);
       const data = await res.json();
       this.cocktail = data.drinks ? data.drinks[0] : {};
-      // Inicializo favoritoLocal según localStorage
       let favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
       this.favoritoLocal = favoritos.includes(this.cocktail.idDrink);
       
-      // Registrar como visto
       this.registrarVisto();
     } catch (e) {
       this.error = e.message;
@@ -105,13 +103,10 @@ export default {
       
       let vistos = JSON.parse(localStorage.getItem('ultimos_vistos')) || [];
       
-      // Remover si ya existe para evitar duplicados
       vistos = vistos.filter(id => id !== this.cocktail.idDrink);
       
-      // Agregar al inicio
       vistos.unshift(this.cocktail.idDrink);
       
-      // Mantener solo los últimos 20
       vistos = vistos.slice(0, 20);
       
       localStorage.setItem('ultimos_vistos', JSON.stringify(vistos));

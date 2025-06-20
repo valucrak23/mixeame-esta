@@ -1,8 +1,15 @@
 <template>
   <div class="container py-4" ref="contenedorHome">
     <section class="mb-5 text-center">
-      <h1 class="display-4 fw-bold pastel-title">¡Bienvenido a CocktailApp!</h1>
+      <h1 class="display-4 fw-bold pastel-title">Master Cocktail App for <span class="girly-text">strong men</span> only</h1>
       <p class="lead">Descubre cócteles, busca tus favoritos y aprende a prepararlos.</p>
+      <!-- ESTO ES EXTRA: Indicador temporal del modo fiesta -->
+      <div v-if="isFiestaMode" class="alert alert-warning mt-3">
+        🎉 ¡Modo fiesta activado! La ruleta debería aparecer abajo.
+      </div>
+      <div v-else class="alert alert-info mt-3">
+        💡 Activa el modo fiesta (🎉) en la barra de navegación para ver la ruleta de tragos.
+      </div>
     </section>
     <section class="mb-4 d-flex flex-wrap gap-3 align-items-center justify-content-center">
       <input v-model="busqueda" @keyup.enter="buscar" class="form-control form-control-lg pastel-input input-busqueda" placeholder="Buscar cóctel por nombre..." aria-label="Buscar cóctel por nombre" />
@@ -18,6 +25,47 @@
     <section class="mb-5">
       <CarouselRecomendados />
     </section>
+    
+    <!-- ESTO ES EXTRA: Ruleta de tragos en modo fiesta -->
+    <section v-if="isFiestaMode" class="mb-5">
+      <div class="ruleta-container">
+        <h2 class="mb-4 pastel-section text-center">🎰 ¡Ruleta de Tragos! 🎰</h2>
+        <div class="ruleta-wrapper">
+          <div class="ruleta-display">
+            <div v-if="!ruletaGirando && !cocktailRuleta" class="ruleta-placeholder">
+              <div class="ruleta-emoji">🍹</div>
+              <p class="ruleta-text">¡Haz girar la ruleta para descubrir un cóctel sorpresa!</p>
+            </div>
+            <div v-else-if="ruletaGirando" class="ruleta-spinning">
+              <div class="ruleta-spinner">🎰</div>
+              <p class="ruleta-text">¡Girando, girando...!</p>
+            </div>
+            <div v-else-if="cocktailRuleta" class="ruleta-result">
+              <img :src="cocktailRuleta.strDrinkThumb" :alt="cocktailRuleta.strDrink" class="ruleta-image">
+              <h4 class="ruleta-title">{{ cocktailRuleta.strDrink }}</h4>
+              <p class="ruleta-category">{{ cocktailRuleta.strCategory || 'Cóctel' }}</p>
+              <div class="ruleta-actions">
+                <button class="btn btn-outline-primary ripple-click" @click="verDetalleRuleta">
+                  Ver detalles
+                </button>
+                <button class="btn btn-outline-danger ripple-click" @click="agregarFavoritoRuleta">
+                  {{ isFavoritoRuleta ? '❤️' : '🤍' }}
+                </button>
+              </div>
+            </div>
+          </div>
+          <button 
+            class="btn btn-ruleta ripple-click" 
+            @click="girarRuleta"
+            :disabled="ruletaGirando"
+            :aria-label="ruletaGirando ? 'Ruleta girando...' : 'Girar ruleta de tragos'"
+          >
+            <span class="btn-ruleta-text">{{ ruletaGirando ? '🎰 Girando...' : '🎰 ¡Girar Ruleta!' }}</span>
+          </button>
+        </div>
+      </div>
+    </section>
+    
     <section class="mb-5">
       <h2 class="mb-4 pastel-section">Cócteles Populares</h2>
       <div style="min-height: 420px; position: relative;">
@@ -121,6 +169,10 @@ export default {
       flippedCard: null,
       animarLike: null,
       showScrollTop: false,
+      isFiestaMode: false,
+      ruletaGirando: false,
+      cocktailRuleta: null,
+      isFavoritoRuleta: false,
     };
   },
   computed: {
@@ -283,12 +335,86 @@ export default {
     handleScrollBtn() {
       this.showScrollTop = window.scrollY > 200;
     },
+    async girarRuleta() {
+      this.ruletaGirando = true;
+      
+      // Disparar confeti al girar
+      if (this.isFiestaMode) {
+        window.dispatchEvent(new CustomEvent('explosion-confeti', {
+          detail: { x: window.innerWidth / 2, y: window.innerHeight / 2, tipo: 'favorito', intensidad: 2 }
+        }));
+      }
+      
+      try {
+        const res = await fetch('https://www.thecocktaildb.com/api/json/v1/1/random.php');
+        const data = await res.json();
+        
+        // Simular tiempo de giro
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        this.cocktailRuleta = data.drinks[0];
+        this.isFavoritoRuleta = this.isFavorito(this.cocktailRuleta.idDrink);
+        
+        // Disparar confeti al resultado
+        if (this.isFiestaMode) {
+          window.dispatchEvent(new CustomEvent('explosion-confeti', {
+            detail: { x: window.innerWidth / 2, y: window.innerHeight / 2, tipo: 'favorito', intensidad: 3 }
+          }));
+        }
+        
+        // Mostrar toast de celebración
+        window.dispatchEvent(new CustomEvent('mostrar-toast', { 
+          detail: { 
+            mensaje: `¡🎉 ${this.cocktailRuleta.strDrink} es tu cóctel del día!`, 
+            tipo: 'success',
+            duracion: 4000
+          } 
+        }));
+        
+      } catch (error) {
+        console.error('Error al girar la ruleta:', error);
+        window.dispatchEvent(new CustomEvent('mostrar-toast', { 
+          detail: { 
+            mensaje: '¡Ups! Algo salió mal con la ruleta', 
+            tipo: 'error',
+            duracion: 3000
+          } 
+        }));
+      } finally {
+        this.ruletaGirando = false;
+      }
+    },
+    verDetalleRuleta() {
+      if (this.cocktailRuleta) {
+        this.$router.push(`/detalle/${this.cocktailRuleta.idDrink}`);
+      }
+    },
+    agregarFavoritoRuleta() {
+      if (this.cocktailRuleta) {
+        this.toggleLike(this.cocktailRuleta);
+        this.isFavoritoRuleta = this.isFavorito(this.cocktailRuleta.idDrink);
+      }
+    },
+    // ESTO ES EXTRA: Detectar modo fiesta
+    detectarModoFiesta() {
+      this.isFiestaMode = document.body.classList.contains('fiesta-mode');
+      console.log('Modo fiesta detectado:', this.isFiestaMode);
+      console.log('Clases del body:', document.body.classList.toString());
+    },
   },
   mounted() {
     window.addEventListener('scroll', this.handleScrollBtn);
+    // ESTO ES EXTRA: Detectar modo fiesta inicial
+    this.detectarModoFiesta();
+    // ESTO ES EXTRA: Escuchar cambios de modo
+    window.addEventListener('modo-cambiado', this.detectarModoFiesta);
+    // ESTO ES EXTRA: Observer para cambios de clase en body
+    const observer = new MutationObserver(() => this.detectarModoFiesta());
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
   },
   beforeUnmount() {
     window.removeEventListener('scroll', this.handleScrollBtn);
+    window.removeEventListener('modo-cambiado', this.detectarModoFiesta);
   },
 }
 </script>

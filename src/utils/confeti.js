@@ -1,6 +1,8 @@
-// Utilidades para el sistema de confeti
+// ESTO ES EXTRA: Utilidades para el sistema de confeti
+// el confeti fue idea de agos pero lo implemente yo -valen
+// quedo re piola -alfredo
 export const confetiUtils = {
-  // Disparar explosión de confeti
+  // ESTO ES EXTRA: Disparar explosión de confeti
   dispararConfeti(x, y, tipo = 'normal', intensidad = 1) {
     // Solo disparar si está en modo fiesta
     if (!document.body.classList.contains('fiesta-mode')) return;
@@ -10,7 +12,7 @@ export const confetiUtils = {
     }));
   },
 
-  // Configurar eventos de confeti para elementos
+  // ESTO ES EXTRA: Configurar eventos de confeti para elementos
   configurarConfeti() {
     if (!document.body.classList.contains('fiesta-mode')) return;
 
@@ -77,12 +79,12 @@ export const confetiUtils = {
     });
   },
 
-  // Limpiar eventos de confeti
+  // ESTO ES EXTRA: Limpiar eventos de confeti
   limpiarConfeti() {
     // Los eventos se limpian automáticamente cuando se desactiva el modo fiesta
   },
 
-  // Inicializar sistema de confeti
+  // ESTO ES EXTRA: Inicializar sistema de confeti
   inicializar() {
     // Configurar eventos cuando se activa el modo fiesta
     const observer = new MutationObserver((mutations) => {
@@ -104,7 +106,7 @@ export const confetiUtils = {
   }
 };
 
-// Inicializar automáticamente
+// ESTO ES EXTRA: Inicializar automáticamente
 if (typeof window !== 'undefined') {
   confetiUtils.inicializar();
 } 

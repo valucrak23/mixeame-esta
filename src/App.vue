@@ -1,4 +1,6 @@
-<template>
+<template> 
+<!-- chicos agregue un monton de pavadas -valen -->
+ <!-- me encanta sjdhakd -agos -->
   <div id="app" @mousemove="moverCoctel">
     <Navbar />
     <router-view />
@@ -39,16 +41,20 @@
         </button>
       </div>
     </transition-group>
+    <!-- ESTO ES EXTRA: Footer del equipo -->
+    <Footer />
   </div>
 </template>
 
 <script>
 import Navbar from './components/Navbar.vue';
 import Confeti from './components/Confeti.vue';
+// ESTO ES EXTRA: Importación del componente Footer
+import Footer from './components/Footer.vue';
 
 export default {
   name: 'App',
-  components: { Navbar, Confeti },
+  components: { Navbar, Confeti, Footer },
   data() {
     return {
       coctelX: 0,
