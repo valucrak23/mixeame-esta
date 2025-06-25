@@ -1,4 +1,5 @@
 @import url('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Dancing+Script:wght@400;600&display=swap');
 
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -8,6 +9,47 @@
   background: #ffe5ec;
   position: relative;
   overflow: hidden;
+}
+
+/* Tipografía especial para el título del navbar */
+.navbar-brand {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  position: relative;
+}
+
+.navbar-brand::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #b5838d, transparent);
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.navbar-brand:hover::after {
+  opacity: 1;
+}
+
+/* Modo oscuro para el título */
+body.dark-mode .navbar-brand::after {
+  background: linear-gradient(90deg, transparent, #ffb4a2, transparent);
+}
+
+/* Modo fiesta - más sutil */
+body.fiesta-mode .navbar-brand {
+  font-family: 'Dancing Script', cursive;
+  font-weight: 600;
+  font-size: 2.2rem;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+body.fiesta-mode .navbar-brand::after {
+  display: none;
 }
 
 .coctel-cursor {
@@ -1404,7 +1446,6 @@ body.fiesta-mode .pastel-navbar {
 body.fiesta-mode .navbar-brand,
 body.fiesta-mode .nav-link {
   color: #fff !important;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
   font-weight: bold;
   animation: textoFiesta 3s ease-in-out infinite;
 }
@@ -2287,3 +2328,44 @@ body.fiesta-mode .girly-text::after {
     opacity: 1;
   }
 } 
+
+/* Icono del navbar */
+.navbar-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.navbar-brand:hover .navbar-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* Modo oscuro para el icono */
+body.dark-mode .navbar-icon {
+  filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.3));
+}
+
+/* Modo fiesta para el icono */
+body.fiesta-mode .navbar-icon {
+  filter: drop-shadow(0 0 8px #feca57);
+  animation: iconoFiesta 2s ease-in-out infinite;
+}
+
+@keyframes iconoFiesta {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.1) rotate(5deg); }
+}
+
+body.fiesta-mode .navbar-brand:hover .navbar-icon {
+  animation: iconoFiesta 1s ease-in-out infinite;
+  filter: drop-shadow(0 0 12px #feca57);
+}
+
+body.fiesta-mode .navbar-brand,
+body.fiesta-mode .nav-link {
+  color: #fff !important;
+  font-weight: bold;
+  animation: textoFiesta 3s ease-in-out infinite;
+}

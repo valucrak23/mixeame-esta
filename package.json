@@ -1,7 +1,7 @@
 {
-  "name": "perritos-app",
+  "name": "mixeame-esta",
   "version": "1.0.0",
-  "description": "Proyecto Vue para buscar perritos",
+  "description": "App para buscar cócteles",
   "main": "src/main.js",
   "scripts": {
     "serve": "vue-cli-service serve",

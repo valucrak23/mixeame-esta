@@ -1,1 +1,1 @@
-// Archivo de barril para componentes 
+// sin esto por alguna razon no funca

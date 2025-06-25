@@ -5,7 +5,10 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-light pastel-navbar shadow-sm">
     <div class="container">
-      <router-link class="navbar-brand pastel-title" to="/">Mixeame Esta</router-link>
+      <router-link class="navbar-brand pastel-title" to="/">
+        <img :src="iconoActual" :alt="'Icono ' + modoActual" class="navbar-icon me-2">
+        Mixeame Esta
+      </router-link>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -56,6 +59,10 @@ export default {
       darkMode: false,
       // ESTO ES EXTRA: Modo fiesta
       fiestaMode: false,
+      // ESTO ES EXTRA: Icono actual
+      iconoActual: '',
+      // ESTO ES EXTRA: Modo actual
+      modoActual: '',
     };
   },
   mounted() {
@@ -73,6 +80,8 @@ export default {
     // Inicializo fiesta mode
     this.fiestaMode = localStorage.getItem('fiestaMode') === 'true';
     this.setFiestaModeClass();
+    // Inicializo icono y modo actual
+    this.actualizarIconoYModo();
   },
   methods: {
     actualizarContador() {
@@ -82,6 +91,7 @@ export default {
     toggleDarkMode() {
       localStorage.setItem('darkMode', this.darkMode);
       this.setDarkModeClass();
+      this.actualizarIconoYModo();
       // Disparar evento para actualizar el cursor
       window.dispatchEvent(new CustomEvent('modo-cambiado'));
     },
@@ -95,6 +105,7 @@ export default {
     toggleFiestaMode() {
       localStorage.setItem('fiestaMode', this.fiestaMode);
       this.setFiestaModeClass();
+      this.actualizarIconoYModo();
       // Disparar evento para actualizar el cursor
       window.dispatchEvent(new CustomEvent('modo-cambiado'));
     },
@@ -103,6 +114,21 @@ export default {
         document.body.classList.add('fiesta-mode');
       } else {
         document.body.classList.remove('fiesta-mode');
+      }
+    },
+    actualizarIconoYModo() {
+      if (this.fiestaMode && this.darkMode) {
+        this.iconoActual = '/3.png';
+        this.modoActual = 'fiesta-oscuro';
+      } else if (this.fiestaMode) {
+        this.iconoActual = '/4.png';
+        this.modoActual = 'fiesta';
+      } else if (this.darkMode) {
+        this.iconoActual = '/2.png';
+        this.modoActual = 'oscuro';
+      } else {
+        this.iconoActual = '/1.png';
+        this.modoActual = 'normal';
       }
     },
   },

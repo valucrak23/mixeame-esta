@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>1.png" id="favicon">
+    <title>Mixeame Esta</title>
+    <style>
+      /* Estilos para prevenir FOUC (Flash of Unstyled Content) */
+      body {
+        margin: 0;
+        padding: 0;
+        background: #ffe5ec;
+        font-family: Avenir, Helvetica, Arial, sans-serif;
+      }
+      #app {
+        min-height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>
+      <strong>Lo sentimos, pero Mixeame Esta no funciona correctamente sin JavaScript habilitado. Por favor, habilítalo para continuar.</strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+    
+    <script>
+      // Script para cambiar el favicon dinámicamente según el tema
+      function cambiarFavicon() {
+        const favicon = document.getElementById('favicon');
+        const darkMode = localStorage.getItem('darkMode') === 'true';
+        const fiestaMode = localStorage.getItem('fiestaMode') === 'true';
+        
+        if (fiestaMode && darkMode) {
+          favicon.href = '3.png'; // Modo fiesta + oscuro
+        } else if (fiestaMode) {
+          favicon.href = '4.png'; // Modo fiesta
+        } else if (darkMode) {
+          favicon.href = '2.png'; // Modo oscuro
+        } else {
+          favicon.href = '1.png'; // Modo normal
+        }
+      }
+      
+      // Cambiar favicon al cargar la página
+      document.addEventListener('DOMContentLoaded', cambiarFavicon);
+      
+      // Escuchar cambios en localStorage
+      window.addEventListener('storage', cambiarFavicon);
+      
+      // Escuchar eventos personalizados de cambio de modo
+      window.addEventListener('modo-cambiado', cambiarFavicon);
+      
+      // Observer para cambios de clase en body
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            cambiarFavicon();
+          }
+        });
+      });
+      
+      // Observar cambios en el body cuando esté disponible
+      if (document.body) {
+        observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+      } else {
+        document.addEventListener('DOMContentLoaded', () => {
+          observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+        });
+      }
+    </script>
+  </body>
+</html> 
