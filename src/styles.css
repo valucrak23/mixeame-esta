@@ -164,9 +164,40 @@ body.fiesta-mode .navbar-brand::after {
 
 /* Ajustes generales */
 .pastel-card .card-title {
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: 1.35rem;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  color: #b5838d;
+  text-align: center;
+  margin-top: 0.7rem;
+  margin-bottom: 0.7rem;
+  text-shadow: 0 2px 8px #fff8, 0 1px 2px #b5838d22;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  transition: color 0.3s, text-shadow 0.3s;
 }
+
+body.dark-mode .pastel-card .card-title {
+  color: #ffb4a2;
+  text-shadow: 0 2px 8px #2d2c3888, 0 1px 2px #ffb4a222;
+}
+
+body.fiesta-mode .pastel-card .card-title {
+  background: linear-gradient(90deg, #ff6b6b, #feca57, #4ecdc4, #b5838d);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  animation: fiestaTitleGradient 3s ease-in-out infinite;
+  text-shadow: 0 2px 8px #fff8, 0 1px 2px #b5838d22;
+}
+
+@keyframes fiestaTitleGradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
 .pastel-card .btn {
   border-radius: 0.7rem;
 }

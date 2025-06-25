@@ -89,6 +89,7 @@
               <div class="flip-card-inner">
                 <div class="flip-card-front">
                   <img v-if="drink.strDrinkThumb" :src="drink.strDrinkThumb" :alt="'Imagen del cóctel ' + drink.strDrink" class="card-img-top img-coctel">
+                  <div class="card-title text-center mb-3">{{ drink.strDrink }}</div>
                 </div>
                 <div class="flip-card-back d-flex flex-column align-items-center justify-content-center">
                   <div class="mb-2"><strong>Categoría:</strong> {{ drink.strCategory || 'N/A' }}</div>
@@ -245,8 +246,22 @@ export default {
       }
       const res = await fetch(url);
       const data = await res.json();
-      this.cocktails = data.drinks || [];
-      this.cocktailsFiltrados = this.cocktails;
+      const basicos = data.drinks || [];
+      // Traer detalles completos solo para los primeros 24 (2 páginas)
+      const ids = basicos.slice(0, 24).map(d => d.idDrink);
+      const detalles = await Promise.all(ids.map(async id => {
+        try {
+          const resDet = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${id}`);
+          const dataDet = await resDet.json();
+          return dataDet.drinks ? dataDet.drinks[0] : null;
+        } catch (e) {
+          return null;
+        }
+      }));
+      // Mezclar los detalles completos con los básicos restantes (por si hay más de 24)
+      const cocktails = detalles.filter(Boolean).concat(basicos.slice(24));
+      this.cocktails = cocktails;
+      this.cocktailsFiltrados = cocktails;
       this.paginaActual = 1;
       this.loading = false;
     },
