@@ -201,7 +201,7 @@ body.fiesta-mode .pastel-card .card-title {
   background-clip: text;
   text-fill-color: transparent;
   animation: fiestaTitleGradient 3s ease-in-out infinite;
-  text-shadow: 0 0 1.5px #fff, 0 0 2.5px #fff;
+  text-shadow: none;
 }
 
 @keyframes fiestaTitleGradient {
@@ -1576,7 +1576,8 @@ body.fiesta-mode .pastel-card:hover {
 }
 
 body.fiesta-mode .pastel-card .card-title {
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
   font-weight: bold;
 }
 
@@ -2423,17 +2424,4 @@ body.fiesta-mode .nav-link {
   #emoji-cursor {
     display: none !important;
   }
-}
-
-body.fiesta-mode .pastel-card .card-title,
-body.fiesta-mode .ruleta-title,
-body.fiesta-mode .flip-card-front .card-title,
-body.fiesta-mode .card-coctel-detalle .card-title {
-  background: linear-gradient(90deg, #ff6b6b, #feca57, #4ecdc4, #b5838d);
-  background-size: 200% 200%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-fill-color: transparent;
-  animation: fiestaTitleGradient 3s ease-in-out infinite;
 }
