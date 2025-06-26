@@ -10,7 +10,13 @@
         Mixeame Esta
       </router-link>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+        <div class="burger-icon-wrapper d-block d-lg-none">
+          <span class="burger-line top"></span>
+          <span class="burger-line middle"></span>
+          <span class="burger-line bottom"></span>
+          <img src="/burger.png" alt="Menú" class="burger-icon" />
+        </div>
+        <span class="navbar-toggler-icon d-none d-lg-block"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
