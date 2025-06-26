@@ -2400,3 +2400,9 @@ body.fiesta-mode .nav-link {
   font-weight: bold;
   animation: textoFiesta 3s ease-in-out infinite;
 }
+
+@media (hover: none) and (pointer: coarse) {
+  #emoji-cursor {
+    display: none !important;
+  }
+}
