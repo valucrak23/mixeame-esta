@@ -22,12 +22,12 @@
         <option v-for="cat in categorias" :key="cat" :value="cat">{{ cat }}</option>
       </select>
     </section>
-    <section class="mb-5">
+    <section class="mb-5" v-if="!busqueda && !filtroCategoria">
       <CarouselRecomendados />
     </section>
     
     <!-- ESTO ES EXTRA: Ruleta de tragos en modo fiesta -->
-    <section v-if="isFiestaMode" class="mb-5">
+    <section v-if="isFiestaMode && !busqueda && !filtroCategoria" class="mb-5">
       <div class="ruleta-container">
         <h2 class="mb-4 pastel-section text-center">🎰 ¡Ruleta de Tragos! 🎰</h2>
         <div class="ruleta-wrapper">
