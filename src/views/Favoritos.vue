@@ -65,7 +65,7 @@
                   <div class="mb-2"><strong>Categoría:</strong> {{ drink.strCategory || 'N/A' }}</div>
                   <div class="mb-2"><strong>Vaso:</strong> {{ drink.strGlass || 'N/A' }}</div>
                   <div class="mb-2"><strong>Ingredientes:</strong> <span v-if="getIngredientes(drink).length">{{ getIngredientes(drink).slice(0,2).join(', ') }}</span><span v-else>N/A</span></div>
-                  <router-link :to="`/detalle/${drink.idDrink}`" class="btn btn-outline-primary mt-3 ripple-click" :aria-label="'Ver detalles de ' + drink.strDrink">Ver detalles</router-link>
+                  <router-link :to="`/detalle/${drink.idDrink}`" class="btn btn-outline-primary mt-3 ripple-click" :aria-label="'Ver detalles de ' + drink.strDrink" @click.native="guardarEstadoFavoritos">Ver detalles</router-link>
                   <button class="btn btn-outline-danger ripple-click btn-like mt-3" @click.stop="mostrarConfirmModal(drink)" aria-label="Quitar de favoritos">
                     <span class="corazon-pop" :class="{ pop: animarLike === drink.idDrink }">❌</span>
                   </button>
@@ -348,9 +348,24 @@ export default {
     cancelarEliminarFavorito() {
       this.showConfirmModal = false;
     },
+    guardarEstadoFavoritos() {
+      localStorage.setItem('estadoFavoritos', JSON.stringify({
+        filtroCategoria: this.filtroCategoria,
+        orden: this.orden,
+        paginaActual: this.paginaActual
+      }));
+    },
   },
   mounted() {
     window.addEventListener('scroll', this.handleScrollBtn);
+    // Restaurar estado desde query si existe
+    if (this.$route && (this.$route.query.filtroCategoria !== undefined || this.$route.query.orden !== undefined)) {
+      this.filtroCategoria = this.$route.query.filtroCategoria || '';
+      this.orden = this.$route.query.orden || 'az';
+      this.paginaActual = parseInt(this.$route.query.paginaActual) || 1;
+      // Limpiar la query para no dejar basura en la URL
+      this.$router.replace({ path: '/favoritos', query: {} });
+    }
   },
   beforeUnmount() {
     window.removeEventListener('scroll', this.handleScrollBtn);

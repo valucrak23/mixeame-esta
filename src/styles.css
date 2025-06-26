@@ -170,7 +170,21 @@ body.fiesta-mode .navbar-brand::after {
   max-width: 350px;
 }
 .select-categoria {
-  max-width: 220px;
+  max-width: 320px;
+  width: 100%;
+  font-size: 1.15rem;
+  border-radius: 1rem;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+@media (max-width: 600px) {
+  .select-categoria {
+    max-width: 100%;
+    font-size: 1rem;
+    padding: 0.6rem 1rem;
+    border-radius: 0.9rem;
+  }
 }
 
 /* Ajustes generales */

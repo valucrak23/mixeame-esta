@@ -9,7 +9,7 @@
       </div>
       <div v-else-if="cocktail" class="row justify-content-center">
         <div class="col-12 col-md-8 col-lg-6">
-          <button class="btn btn-outline-primary mb-3 ripple-click" @click="$router.back()" aria-label="Volver atrás">
+          <button class="btn btn-outline-primary mb-3 ripple-click" @click="volverAHomeConEstado" aria-label="Volver atrás">
             ← Volver
           </button>
           <div class="card pastel-card card-coctel-detalle shadow">
@@ -157,6 +157,31 @@ export default {
         this.animarFav = true;
         setTimeout(() => { this.animarFav = false; }, 500);
       });
+    },
+    volverAHomeConEstado() {
+      const estadoBusqueda = localStorage.getItem('estadoBusquedaFiltro');
+      if (estadoBusqueda) {
+        const params = JSON.parse(estadoBusqueda);
+        localStorage.removeItem('estadoBusquedaFiltro');
+        this.$router.push({ path: '/', query: {
+          busqueda: params.busqueda || '',
+          filtroCategoria: params.filtroCategoria || '',
+          paginaActual: params.paginaActual || 1
+        }});
+        return;
+      }
+      const estadoFavoritos = localStorage.getItem('estadoFavoritos');
+      if (estadoFavoritos) {
+        const params = JSON.parse(estadoFavoritos);
+        localStorage.removeItem('estadoFavoritos');
+        this.$router.push({ path: '/favoritos', query: {
+          filtroCategoria: params.filtroCategoria || '',
+          orden: params.orden || 'az',
+          paginaActual: params.paginaActual || 1
+        }});
+        return;
+      }
+      this.$router.back();
     },
   },
 }

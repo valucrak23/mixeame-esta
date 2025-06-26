@@ -99,7 +99,7 @@
                     <button class="btn btn-outline-danger ripple-click btn-like" @click.stop="toggleLike(drink)" :aria-label="isFavorito(drink.idDrink) ? 'Quitar de favoritos' : 'Agregar a favoritos'">
                       <span class="corazon-pop" :class="{ pop: animarLike === drink.idDrink }">{{ isFavorito(drink.idDrink) ? '❤️' : '🤍' }}</span>
                     </button>
-                    <router-link :to="`/detalle/${drink.idDrink}`" class="btn btn-outline-primary mt-3 ripple-click" :aria-label="'Ver detalles de ' + drink.strDrink">Ver detalles</router-link>
+                    <router-link :to="`/detalle/${drink.idDrink}`" class="btn btn-outline-primary mt-3 ripple-click" :aria-label="'Ver detalles de ' + drink.strDrink" @click.native="guardarEstadoBusquedaFiltro">Ver detalles</router-link>
                   </div>
                 </div>
               </div>
@@ -418,8 +418,15 @@ export default {
       console.log('Modo fiesta detectado:', this.isFiestaMode);
       console.log('Clases del body:', document.body.classList.toString());
     },
+    guardarEstadoBusquedaFiltro() {
+      localStorage.setItem('estadoBusquedaFiltro', JSON.stringify({
+        busqueda: this.busqueda,
+        filtroCategoria: this.filtroCategoria,
+        paginaActual: this.paginaActual
+      }));
+    },
   },
-  mounted() {
+  async mounted() {
     window.addEventListener('scroll', this.handleScrollBtn);
     // ESTO ES EXTRA: Detectar modo fiesta inicial
     this.detectarModoFiesta();
@@ -428,6 +435,20 @@ export default {
     // ESTO ES EXTRA: Observer para cambios de clase en body
     const observer = new MutationObserver(() => this.detectarModoFiesta());
     observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+    // Restaurar estado desde query si existe
+    if (this.$route && (this.$route.query.busqueda !== undefined || this.$route.query.filtroCategoria !== undefined)) {
+      this.busqueda = this.$route.query.busqueda || '';
+      this.filtroCategoria = this.$route.query.filtroCategoria || '';
+      this.paginaActual = parseInt(this.$route.query.paginaActual) || 1;
+      if (this.busqueda) {
+        await this.buscar();
+      } else if (this.filtroCategoria) {
+        await this.cargarPorCategoria();
+      }
+      // Limpiar la query para no dejar basura en la URL
+      this.$router.replace({ path: '/', query: {} });
+    }
   },
   beforeUnmount() {
     window.removeEventListener('scroll', this.handleScrollBtn);
