@@ -237,7 +237,7 @@ export default {
       this.scrollToCards();
     },
     // ESTO ES EXTRA: Exportar a PDF
-    exportarPDF() {
+    async exportarPDF() {
       if (!this.cocktailsFiltradosYOrdenados.length) {
         window.dispatchEvent(new CustomEvent('mostrar-toast', { 
           detail: { 
@@ -248,87 +248,208 @@ export default {
         }));
         return;
       }
-      
+      // Detectar modo y logo
+      const isDark = document.body.classList.contains('dark-mode');
+      let logo, fondoLogo;
+      if (isDark) {
+        logo = '2.png';
+        fondoLogo = '/brillos-circulo-osc.png';
+      } else {
+        logo = '3.png';
+        fondoLogo = '/circulo-brillante.png';
+      }
+      // Tema
+      const pastel = {
+        bg: [255, 245, 250],
+        text: [181, 131, 141],
+        deco: [254, 202, 87],
+        decoLine: [181, 131, 141],
+        infoText: [17, 17, 17],
+        footerText: [68, 68, 68],
+        title: [181, 131, 141],
+      };
+      const dark = {
+        bg: [35, 34, 43],
+        text: [255, 180, 162],
+        deco: [100, 180, 255],
+        decoLine: [255, 180, 162],
+        infoText: [68, 68, 68],
+        footerText: [240, 240, 240],
+        title: [255, 180, 162],
+      };
+      const theme = isDark ? dark : pastel;
+      // Cargar logo y decoraciones como base64
+      const getBase64 = (url) => new Promise((resolve, reject) => {
+        const img = new window.Image();
+        img.crossOrigin = 'Anonymous';
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          resolve(canvas.toDataURL('image/png'));
+        };
+        img.onerror = function(e) {
+          reject(new Error('No se pudo cargar la imagen: ' + url));
+        };
+        img.src = url;
+      });
+      let logoBase64, fondoLogoBase64 = null, brillitosBase64 = null;
+      try {
+        logoBase64 = await getBase64(`/${logo}`);
+      } catch (e) {
+        window.dispatchEvent(new CustomEvent('mostrar-toast', { 
+          detail: { mensaje: e.message, tipo: 'error', duracion: 4000 }
+        }));
+        return;
+      }
+      if (fondoLogo) {
+        try {
+          fondoLogoBase64 = await getBase64(fondoLogo);
+        } catch (e) {
+          window.dispatchEvent(new CustomEvent('mostrar-toast', { 
+            detail: { mensaje: e.message, tipo: 'error', duracion: 4000 }
+          }));
+          return;
+        }
+      }
+      try {
+        brillitosBase64 = await getBase64('/brillitos.png');
+      } catch (e) {
+        window.dispatchEvent(new CustomEvent('mostrar-toast', { 
+          detail: { mensaje: e.message, tipo: 'error', duracion: 4000 }
+        }));
+        return;
+      }
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       const margin = 20;
       const contentWidth = pageWidth - 2 * margin;
-      
-      // Título
-      pdf.setFontSize(24);
-      pdf.setTextColor(181, 131, 141);
-      pdf.text('Mis Cócteles Favoritos', pageWidth / 2, 30, { align: 'center' });
-      
-      // Fecha
-      pdf.setFontSize(12);
-      pdf.setTextColor(100, 100, 100);
-      pdf.text(`Generado el: ${new Date().toLocaleDateString('es-ES')}`, pageWidth / 2, 40, { align: 'center' });
-      
-      // Información general
-      pdf.setFontSize(14);
-      pdf.setTextColor(60, 60, 60);
-      pdf.text(`Total de cócteles: ${this.cocktailsFiltradosYOrdenados.length}`, margin, 55);
-      
-      let yPosition = 70;
-      const lineHeight = 6;
-      const titleHeight = 8;
-      const spaceBetweenDrinks = 10;
-      
-      this.cocktailsFiltradosYOrdenados.forEach((drink, index) => {
-        // Nueva página si es necesario
-        if (yPosition > pageHeight - margin - 50) {
-          pdf.addPage();
-          yPosition = margin + 20;
-        }
-        
-        // Nombre del cóctel
-        pdf.setFontSize(16);
-        pdf.setTextColor(181, 131, 141);
-        pdf.text(`${index + 1}. ${drink.strDrink}`, margin, yPosition);
-        yPosition += titleHeight + 2;
-        
-        // Categoría y vaso
-        pdf.setFontSize(11);
-        pdf.setTextColor(80, 80, 80);
-        pdf.text(`Categoría: ${drink.strCategory || 'N/A'}`, margin, yPosition);
-        yPosition += lineHeight;
-        pdf.text(`Vaso: ${drink.strGlass || 'N/A'}`, margin, yPosition);
-        yPosition += lineHeight;
-        
-        // Ingredientes
-        const ingredientes = this.getIngredientes(drink);
-        if (ingredientes.length) {
-          const ingredientesText = `Ingredientes: ${ingredientes.join(', ')}`;
-          // Dividir ingredientes si son muy largos
-          const lines = pdf.splitTextToSize(ingredientesText, contentWidth);
-          pdf.text(lines, margin, yPosition);
-          yPosition += lineHeight * lines.length;
-        }
-        
-        // Instrucciones (divididas en múltiples líneas si es necesario)
-        if (drink.strInstructions) {
-          const instruccionesText = `Instrucciones: ${drink.strInstructions}`;
-          const lines = pdf.splitTextToSize(instruccionesText, contentWidth);
-          
-          // Verificar si hay espacio suficiente para las instrucciones
-          const neededSpace = lineHeight * lines.length;
-          if (yPosition + neededSpace > pageHeight - margin) {
-            pdf.addPage();
-            yPosition = margin + 20;
+      let yPosition = 50;
+      const lineHeight = 7;
+      const titleHeight = 10;
+      const spaceBetweenDrinks = 12;
+      // Header decorado con logo al lado (más separado, con sombra)
+      function drawHeader(pageNum) {
+        pdf.setFillColor(...theme.bg);
+        pdf.rect(0, 0, pageWidth, 30, 'F');
+        // Logo a la izquierda del título, bien proporcionado y con fondo decorativo
+        const logoW = 20, logoH = 20;
+        const logoY = 6;
+        const logoX = pageWidth/2 - 52;
+        // Fondo decorativo detrás del logo
+        if (fondoLogoBase64) {
+          let fondoW, fondoH;
+          if (isDark) {
+            fondoW = logoW * 1.3;
+            fondoH = logoH * 1.3;
+          } else {
+            fondoW = logoW * 1.6;
+            fondoH = logoH * 1.6;
           }
-          
-          pdf.text(lines, margin, yPosition);
-          yPosition += lineHeight * lines.length;
+          pdf.addImage(fondoLogoBase64, 'PNG', logoX + logoW/2 - fondoW/2, logoY + logoH/2 - fondoH/2, fondoW, fondoH);
         }
-        
-        yPosition += spaceBetweenDrinks; // Espacio entre cócteles
+        // Logo
+        pdf.addImage(logoBase64, 'PNG', logoX, logoY, logoW, logoH, undefined, 'FAST');
+        pdf.setFontSize(22);
+        pdf.setTextColor(...theme.title);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Mixeame Esta', pageWidth/2 + 10, 18, {align:'left'});
+        // Línea decorativa
+        pdf.setDrawColor(...theme.decoLine);
+        pdf.setLineWidth(1.2);
+        pdf.line(margin, 28, pageWidth - margin, 28);
+      }
+      // Footer decorado
+      function drawFooter(pageNum, totalPages) {
+        pdf.setFillColor(...theme.bg);
+        pdf.rect(0, pageHeight-18, pageWidth, 18, 'F');
+        pdf.setDrawColor(...theme.decoLine);
+        pdf.setLineWidth(1.2);
+        pdf.line(margin, pageHeight-16, pageWidth-margin, pageHeight-16);
+        pdf.setFontSize(11);
+        pdf.setTextColor(...theme.footerText);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`Página ${pageNum} de ${totalPages}`, pageWidth/2, pageHeight-7, {align:'center'});
+        pdf.text(`Generado el: ${new Date().toLocaleDateString('es-ES')}`, margin, pageHeight-7);
+      }
+      // Preparamos todas las páginas
+      let pages = [];
+      let currentPage = [];
+      let currentY = yPosition;
+      this.cocktailsFiltradosYOrdenados.forEach((drink, index) => {
+        let block = [];
+        // Limpiar nombre y otros campos de caracteres extraños
+        const clean = txt => (txt || '').replace(/[;()']/g, '').trim();
+        // Nombre
+        block.push({type:'title', text:`${index+1}. ${clean(drink.strDrink)}`});
+        // Categoría y vaso
+        block.push({type:'text', text:`Categoría: ${clean(drink.strCategory) || 'N/A'}`});
+        block.push({type:'text', text:`Vaso: ${clean(drink.strGlass) || 'N/A'}`});
+        // Ingredientes (cada uno como item separado para puntear)
+        const ingredientes = this.getIngredientes(drink).map(clean);
+        if (ingredientes.length) {
+          block.push({type:'ingredientes', items: ingredientes});
+        }
+        // Instrucciones
+        if (drink.strInstructions) {
+          block.push({type:'text', text:`Instrucciones: ${clean(drink.strInstructions)}`});
+        }
+        // Calcular espacio
+        let blockHeight = block.length * lineHeight + titleHeight + (ingredientes.length ? ingredientes.length * lineHeight : 0);
+        if (currentY + blockHeight > pageHeight - margin - 20) {
+          pages.push(currentPage);
+          currentPage = [];
+          currentY = yPosition;
+        }
+        currentPage.push(block);
+        currentY += blockHeight + spaceBetweenDrinks;
       });
-      
+      if (currentPage.length) pages.push(currentPage);
+      // Dibujar páginas
+      pages.forEach((blocks, i) => {
+        if (i > 0) pdf.addPage();
+        drawHeader(i+1);
+        let y = yPosition;
+        blocks.forEach(block => {
+          block.forEach((item, j) => {
+            if (item.type === 'title') {
+              pdf.setFontSize(16);
+              pdf.setTextColor(...theme.title);
+              pdf.setFont('helvetica', 'bold');
+              pdf.text(item.text, margin, y);
+              y += titleHeight;
+            } else if (item.type === 'ingredientes') {
+              pdf.setFontSize(12);
+              pdf.setTextColor(...theme.infoText);
+              pdf.setFont('helvetica', 'normal');
+              pdf.text('Ingredientes:', margin+2, y);
+              y += lineHeight;
+              item.items.forEach(ing => {
+                pdf.addImage(brillitosBase64, 'PNG', margin+4, y-5, 5, 5);
+                pdf.text(ing, margin+11, y);
+                y += lineHeight;
+              });
+            } else {
+              pdf.setFontSize(12);
+              pdf.setTextColor(...theme.infoText);
+              pdf.setFont('helvetica', 'normal');
+              // Dividir si es muy largo
+              const lines = pdf.splitTextToSize(item.text, contentWidth);
+              lines.forEach(line => {
+                pdf.text(line, margin+6, y);
+                y += lineHeight;
+              });
+            }
+          });
+          y += spaceBetweenDrinks;
+        });
+        drawFooter(i+1, pages.length);
+      });
       // Guardar PDF
       pdf.save(`favoritos_cocktails_${new Date().toISOString().split('T')[0]}.pdf`);
-      
-      // ESTO ES EXTRA: Notificación toast
       window.dispatchEvent(new CustomEvent('mostrar-toast', { 
         detail: { 
           mensaje: '¡Favoritos exportados en PDF!', 
