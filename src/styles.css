@@ -201,7 +201,8 @@ body.fiesta-mode .pastel-card .card-title {
   background-clip: text;
   text-fill-color: transparent;
   animation: fiestaTitleGradient 3s ease-in-out infinite;
-  text-shadow: none;
+  text-shadow: none !important;
+  font-weight: 900;
 }
 
 @keyframes fiestaTitleGradient {
