@@ -2440,3 +2440,9 @@ body.fiesta-mode .nav-link {
     display: none !important;
   }
 }
+
+@media (max-width: 700px) {
+  #emoji-cursor {
+    display: none !important;
+  }
+}
