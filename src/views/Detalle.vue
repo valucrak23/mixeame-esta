@@ -1,52 +1,54 @@
 <template>
-  <div class="container py-4">
-    <div v-if="cargando" class="text-center my-5">
-      <Loader />
-    </div>
-    <div v-else-if="error" class="alert alert-danger text-center my-5">
-      {{ error }}
-    </div>
-    <div v-else-if="cocktail" class="row justify-content-center">
-      <div class="col-12 col-md-8 col-lg-6">
-        <button class="btn btn-outline-primary mb-3 ripple-click" @click="$router.back()" aria-label="Volver atrás">
-          ← Volver
-        </button>
-        <div class="card pastel-card card-coctel-detalle shadow">
-          <img :src="cocktail.strDrinkThumb" :alt="'Imagen del cóctel ' + cocktail.strDrink" class="card-img-top img-coctel-detalle">
-          <div class="card-body">
-            <h2 class="card-title text-center mb-3">{{ cocktail.strDrink }}</h2>
-            <p class="mb-2 detalle-info"><strong>Categoría:</strong> {{ cocktail.strCategory }}</p>
-            <p class="mb-2 detalle-info"><strong>Tipo:</strong> {{ cocktail.strAlcoholic }}</p>
-            <p class="mb-2 detalle-info"><strong>Vaso:</strong> {{ cocktail.strGlass }}</p>
-            <h5 class="mt-4">Ingredientes:</h5>
-            <ul class="list-unstyled mb-3">
-              <li v-for="(ing, i) in ingredientes" :key="i">🍸 {{ ing }}</li>
-            </ul>
-            <h5>Instrucciones:</h5>
-            <p>{{ cocktail.strInstructions }}</p>
-            <div v-if="mensaje" class="alert alert-success mt-3" role="alert">
-              {{ mensaje }}
+  <div class="main-content">
+    <div class="container py-4">
+      <div v-if="cargando" class="text-center my-5">
+        <Loader />
+      </div>
+      <div v-else-if="error" class="alert alert-danger text-center my-5">
+        {{ error }}
+      </div>
+      <div v-else-if="cocktail" class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+          <button class="btn btn-outline-primary mb-3 ripple-click" @click="$router.back()" aria-label="Volver atrás">
+            ← Volver
+          </button>
+          <div class="card pastel-card card-coctel-detalle shadow">
+            <img :src="cocktail.strDrinkThumb" :alt="'Imagen del cóctel ' + cocktail.strDrink" class="card-img-top img-coctel-detalle">
+            <div class="card-body">
+              <h2 class="card-title text-center mb-3">{{ cocktail.strDrink }}</h2>
+              <p class="mb-2 detalle-info"><strong>Categoría:</strong> {{ cocktail.strCategory }}</p>
+              <p class="mb-2 detalle-info"><strong>Tipo:</strong> {{ cocktail.strAlcoholic }}</p>
+              <p class="mb-2 detalle-info"><strong>Vaso:</strong> {{ cocktail.strGlass }}</p>
+              <h5 class="mt-4">Ingredientes:</h5>
+              <ul class="list-unstyled mb-3">
+                <li v-for="(ing, i) in ingredientes" :key="i">🍸 {{ ing }}</li>
+              </ul>
+              <h5>Instrucciones:</h5>
+              <p>{{ cocktail.strInstructions }}</p>
+              <div v-if="mensaje" class="alert alert-success mt-3" role="alert">
+                {{ mensaje }}
+              </div>
+              <button 
+                class="btn mt-3 w-100 ripple-click"
+                :class="[favoritoLocal ? 'btn-danger' : 'btn-outline-success', animarFav ? 'btn-fav-anim' : '']"
+                @click="toggleFavorito"
+                :aria-label="favoritoLocal ? 'Quitar ' + cocktail.strDrink + ' de favoritos' : 'Agregar ' + cocktail.strDrink + ' a favoritos'"
+                tabindex="0"
+                @keydown.enter.prevent="toggleFavorito"
+                @keydown.space.prevent="toggleFavorito"
+              >
+                <span class="corazon-pop" :class="{ pop: animarFav }">
+                  {{ favoritoLocal ? '❌' : '❤️' }}
+                </span>
+                {{ favoritoLocal ? 'Quitar de Favoritos' : 'Agregar a Favoritos' }}
+              </button>
             </div>
-            <button 
-              class="btn mt-3 w-100 ripple-click"
-              :class="[favoritoLocal ? 'btn-danger' : 'btn-outline-success', animarFav ? 'btn-fav-anim' : '']"
-              @click="toggleFavorito"
-              :aria-label="favoritoLocal ? 'Quitar ' + cocktail.strDrink + ' de favoritos' : 'Agregar ' + cocktail.strDrink + ' a favoritos'"
-              tabindex="0"
-              @keydown.enter.prevent="toggleFavorito"
-              @keydown.space.prevent="toggleFavorito"
-            >
-              <span class="corazon-pop" :class="{ pop: animarFav }">
-                {{ favoritoLocal ? '❌' : '❤️' }}
-              </span>
-              {{ favoritoLocal ? 'Quitar de Favoritos' : 'Agregar a Favoritos' }}
-            </button>
           </div>
         </div>
       </div>
-    </div>
-    <div v-else class="text-center my-5">
-      <p>No se encontró el cóctel.</p>
+      <div v-else class="text-center my-5">
+        <p>No se encontró el cóctel.</p>
+      </div>
     </div>
   </div>
 </template>

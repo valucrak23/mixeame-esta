@@ -2,80 +2,96 @@
 <!-- esta vista la hice yo -valen -->
 <!-- el pdf fui yo -alfredo -->
 <template>
-  <div class="container py-4" ref="contenedorFavs">
-    <h1 class="mb-4 pastel-title text-center">Tus Cócteles Favoritos</h1>
-    <div class="d-flex flex-wrap gap-3 align-items-center justify-content-center mb-4">
-      <!-- ESTO ES EXTRA: Filtro por categoría en favoritos -->
-      <select v-model="filtroCategoria" class="form-select pastel-input select-categoria" style="max-width:220px" @change="filtrarPorCategoria">
-        <option value="">Todas las categorías</option>
-        <option v-for="cat in categorias" :key="cat" :value="cat">{{ cat }}</option>
-      </select>
-      <!-- ESTO ES EXTRA: Ordenamiento en favoritos -->
-      <select v-model="orden" class="form-select pastel-input select-categoria" style="max-width:180px">
-        <option value="az">Nombre (A-Z)</option>
-        <option value="za">Nombre (Z-A)</option>
-      </select>
-      <!-- ESTO ES EXTRA: Exportar a PDF -->
-      <div class="d-flex gap-2" v-if="cocktailsFiltradosYOrdenados.length">
-        <button class="btn btn-outline-info ripple-click" @click="exportarPDF" title="Exportar favoritos en formato PDF">
-          📋 PDF
-        </button>
-      </div>
-    </div>
-    <div style="min-height: 420px; position: relative;">
-      <transition name="fade-loader">
-        <div v-if="cargando" class="text-center my-5">
-          <Loader />
+  <div class="main-content">
+    <div class="container py-4" ref="contenedorFavs">
+      <h1 class="mb-4 pastel-title text-center">Tus Cócteles Favoritos</h1>
+      <div class="d-flex flex-wrap gap-3 align-items-center justify-content-center mb-4">
+        <!-- ESTO ES EXTRA: Filtro por categoría en favoritos -->
+        <select v-model="filtroCategoria" class="form-select pastel-input select-categoria" style="max-width:220px" @change="filtrarPorCategoria">
+          <option value="">Todas las categorías</option>
+          <option v-for="cat in categorias" :key="cat" :value="cat">{{ cat }}</option>
+        </select>
+        <!-- ESTO ES EXTRA: Ordenamiento en favoritos -->
+        <select v-model="orden" class="form-select pastel-input select-categoria" style="max-width:180px">
+          <option value="az">Nombre (A-Z)</option>
+          <option value="za">Nombre (Z-A)</option>
+        </select>
+        <!-- ESTO ES EXTRA: Exportar a PDF -->
+        <div class="d-flex gap-2" v-if="cocktailsFiltradosYOrdenados.length">
+          <button class="btn btn-outline-info ripple-click" @click="exportarPDF" title="Exportar favoritos en formato PDF">
+            📋 PDF
+          </button>
         </div>
-      </transition>
-      <transition-group name="fade-slide" tag="div" v-if="!cargando && cocktailsFiltradosYOrdenados.length" class="row g-4">
-        <div v-for="drink in cocktailsFiltradosYOrdenados" :key="drink.idDrink" class="col-12 col-sm-6 col-md-4 col-lg-3">
-          <!-- ESTO ES EXTRA: Cards con efecto flip -->
-          <div
-            class="card h-100 shadow pastel-card card-coctel flip-card"
-            :class="{ flipped: flippedCard === drink.idDrink }"
-            @click="flipCard(drink.idDrink)"
-            @mouseleave="flippedCard = null"
-            tabindex="0"
-            :aria-label="'Ver información de ' + drink.strDrink"
-            @keydown.enter.prevent="flipCard(drink.idDrink)"
-            @keydown.space.prevent="flipCard(drink.idDrink)"
-          >
-            <div class="flip-card-inner">
-              <div class="flip-card-front d-flex flex-column align-items-center justify-content-center">
-                <img v-if="drink.strDrinkThumb" :src="drink.strDrinkThumb" :alt="drink.strDrink" class="card-img-top img-coctel mb-2 img-coctel-alta">
-                <h5 class="card-title text-capitalize text-center">{{ drink.strDrink }}</h5>
-              </div>
-              <div class="flip-card-back d-flex flex-column align-items-center justify-content-center">
-                <div class="mb-2"><strong>Categoría:</strong> {{ drink.strCategory || 'N/A' }}</div>
-                <div class="mb-2"><strong>Vaso:</strong> {{ drink.strGlass || 'N/A' }}</div>
-                <div class="mb-2"><strong>Ingredientes:</strong> <span v-if="getIngredientes(drink).length">{{ getIngredientes(drink).slice(0,2).join(', ') }}</span><span v-else>N/A</span></div>
-                <router-link :to="`/detalle/${drink.idDrink}`" class="btn btn-outline-primary mt-3 ripple-click" :aria-label="'Ver detalles de ' + drink.strDrink">Ver detalles</router-link>
-                <button class="btn btn-outline-danger ripple-click btn-like mt-3" @click.stop="quitarFavorito(drink)" aria-label="Quitar de favoritos">
-                  <span class="corazon-pop" :class="{ pop: animarLike === drink.idDrink }">❌</span>
-                </button>
+      </div>
+      <!-- Modal de confirmación para eliminar favorito -->
+      <div v-if="showConfirmModal" class="modal-overlay">
+        <div class="modal-content text-center p-4">
+          <h5 class="mb-3">¿Eliminar de favoritos?</h5>
+          <p>¿Seguro que quieres eliminar <strong>{{ cocktailAEliminar?.strDrink }}</strong> de tus favoritos?</p>
+          <div class="d-flex justify-content-center gap-3 mt-4">
+            <button class="btn btn-danger ripple-click" @click="confirmarEliminarFavorito">Sí, eliminar</button>
+            <button class="btn btn-outline-secondary ripple-click" @click="cancelarEliminarFavorito">Cancelar</button>
+          </div>
+        </div>
+      </div>
+      <!-- Fin modal -->
+      
+      <!-- Cards de favoritos -->
+      <div style="min-height: 420px; position: relative;">
+        <transition name="fade-loader">
+          <div v-if="cargando" class="text-center my-5">
+            <Loader />
+          </div>
+        </transition>
+        <transition-group name="fade-slide" tag="div" v-if="!cargando && cocktailsFiltradosYOrdenados.length" class="row g-4">
+          <div v-for="drink in cocktailsFiltradosYOrdenados" :key="drink.idDrink" class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <!-- ESTO ES EXTRA: Cards con efecto flip -->
+            <div
+              class="card h-100 shadow pastel-card card-coctel flip-card"
+              :class="{ flipped: flippedCard === drink.idDrink }"
+              @click="flipCard(drink.idDrink)"
+              @mouseleave="flippedCard = null"
+              tabindex="0"
+              :aria-label="'Ver información de ' + drink.strDrink"
+              @keydown.enter.prevent="flipCard(drink.idDrink)"
+              @keydown.space.prevent="flipCard(drink.idDrink)"
+            >
+              <div class="flip-card-inner">
+                <div class="flip-card-front d-flex flex-column align-items-center justify-content-center">
+                  <img v-if="drink.strDrinkThumb" :src="drink.strDrinkThumb" :alt="drink.strDrink" class="card-img-top img-coctel mb-2 img-coctel-alta">
+                  <h5 class="card-title text-capitalize text-center">{{ drink.strDrink }}</h5>
+                </div>
+                <div class="flip-card-back d-flex flex-column align-items-center justify-content-center">
+                  <div class="mb-2"><strong>Categoría:</strong> {{ drink.strCategory || 'N/A' }}</div>
+                  <div class="mb-2"><strong>Vaso:</strong> {{ drink.strGlass || 'N/A' }}</div>
+                  <div class="mb-2"><strong>Ingredientes:</strong> <span v-if="getIngredientes(drink).length">{{ getIngredientes(drink).slice(0,2).join(', ') }}</span><span v-else>N/A</span></div>
+                  <router-link :to="`/detalle/${drink.idDrink}`" class="btn btn-outline-primary mt-3 ripple-click" :aria-label="'Ver detalles de ' + drink.strDrink">Ver detalles</router-link>
+                  <button class="btn btn-outline-danger ripple-click btn-like mt-3" @click.stop="mostrarConfirmModal(drink)" aria-label="Quitar de favoritos">
+                    <span class="corazon-pop" :class="{ pop: animarLike === drink.idDrink }">❌</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </transition-group>
-      <transition name="fade-msg">
-        <div v-if="!cargando && !cocktailsFiltradosYOrdenados.length && !error" class="text-center my-5">
-          <p>No tienes cócteles favoritos aún.</p>
-        </div>
-      </transition>
-      <transition name="fade-msg">
-        <div v-if="!cargando && error" class="alert alert-danger text-center my-5">
-          {{ error }}
-        </div>
-      </transition>
+        </transition-group>
+        <transition name="fade-msg">
+          <div v-if="!cargando && !cocktailsFiltradosYOrdenados.length && !error" class="text-center my-5">
+            <p>No tienes cócteles favoritos aún.</p>
+          </div>
+        </transition>
+        <transition name="fade-msg">
+          <div v-if="!cargando && error" class="alert alert-danger text-center my-5">
+            {{ error }}
+          </div>
+        </transition>
+      </div>
+      <!-- ESTO ES EXTRA: Botón de scroll to top -->
+      <button v-show="showScrollTop" class="btn-scroll-top" @click="scrollToTop" aria-label="Volver arriba">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 19V5M12 5L5 12M12 5l7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
     </div>
-    <!-- ESTO ES EXTRA: Botón de scroll to top -->
-    <button v-show="showScrollTop" class="btn-scroll-top" @click="scrollToTop" aria-label="Volver arriba">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 19V5M12 5L5 12M12 5l7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </button>
   </div>
 </template>
 
@@ -99,6 +115,8 @@ export default {
       flippedCard: null,
       animarLike: null,
       showScrollTop: false,
+      showConfirmModal: false,
+      cocktailAEliminar: null,
     };
   },
   computed: {
@@ -318,6 +336,17 @@ export default {
           duracion: 3000
         } 
       }));
+    },
+    mostrarConfirmModal(drink) {
+      this.cocktailAEliminar = drink;
+      this.showConfirmModal = true;
+    },
+    confirmarEliminarFavorito() {
+      this.quitarFavorito(this.cocktailAEliminar);
+      this.showConfirmModal = false;
+    },
+    cancelarEliminarFavorito() {
+      this.showConfirmModal = false;
     },
   },
   mounted() {

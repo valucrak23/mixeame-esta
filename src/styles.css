@@ -9,6 +9,17 @@
   background: #ffe5ec;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1 0 auto;
+}
+
+.footer-pastel {
+  flex-shrink: 0;
+  width: 100%;
 }
 
 /* Tipografía especial para el título del navbar */
@@ -190,7 +201,7 @@ body.fiesta-mode .pastel-card .card-title {
   background-clip: text;
   text-fill-color: transparent;
   animation: fiestaTitleGradient 3s ease-in-out infinite;
-  text-shadow: 0 2px 8px #fff8, 0 1px 2px #b5838d22;
+  text-shadow: none;
 }
 
 @keyframes fiestaTitleGradient {
@@ -2413,4 +2424,12 @@ body.fiesta-mode .nav-link {
   #emoji-cursor {
     display: none !important;
   }
+}
+
+body.fiesta-mode .pastel-card .card-title,
+body.fiesta-mode .ruleta-title,
+body.fiesta-mode .flip-card-front .card-title,
+body.fiesta-mode .card-coctel-detalle .card-title {
+  text-shadow: none !important;
+  color: #fff !important;
 }
