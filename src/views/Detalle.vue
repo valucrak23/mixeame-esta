@@ -8,6 +8,9 @@
     </div>
     <div v-else-if="cocktail" class="row justify-content-center">
       <div class="col-12 col-md-8 col-lg-6">
+        <button class="btn btn-outline-primary mb-3 ripple-click" @click="$router.back()" aria-label="Volver atrás">
+          ← Volver
+        </button>
         <div class="card pastel-card card-coctel-detalle shadow">
           <img :src="cocktail.strDrinkThumb" :alt="'Imagen del cóctel ' + cocktail.strDrink" class="card-img-top img-coctel-detalle">
           <div class="card-body">
