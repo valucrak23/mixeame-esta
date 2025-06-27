@@ -2446,6 +2446,11 @@ body.fiesta-mode .nav-link {
     display: none !important;
   }
   
+  /* Tamaño del título en móvil (modo normal) */
+  .navbar-brand {
+    font-size: 1.8rem !important;
+  }
+  
   /* Mejorar legibilidad del título en modo fiesta en móvil */
   body.fiesta-mode .navbar-brand {
     background: linear-gradient(90deg, #96ceb4, #2c5aa0, #4ecdc4, #ff6b6b);
